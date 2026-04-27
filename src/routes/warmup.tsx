@@ -43,7 +43,7 @@ function WarmupPage() {
     load();
   };
 
-  const update = async (id: string, status: string) => {
+  const update = async (id: string, status: "running" | "paused" | "completed") => {
     await supabase.from("warmup_campaigns").update({ status }).eq("id", id);
     load();
   };
