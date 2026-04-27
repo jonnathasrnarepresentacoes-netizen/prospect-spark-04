@@ -9,11 +9,41 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as WarmupRouteImport } from './routes/warmup'
+import { Route as TemplatesRouteImport } from './routes/templates'
+import { Route as SheetsRouteImport } from './routes/sheets'
+import { Route as ScanRouteImport } from './routes/scan'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as EmailCampaignsRouteImport } from './routes/email-campaigns'
 import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as CreditsRouteImport } from './routes/credits'
+import { Route as ConnectionsRouteImport } from './routes/connections'
+import { Route as CompaniesRouteImport } from './routes/companies'
+import { Route as CampaignsRouteImport } from './routes/campaigns'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 
+const WarmupRoute = WarmupRouteImport.update({
+  id: '/warmup',
+  path: '/warmup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TemplatesRoute = TemplatesRouteImport.update({
+  id: '/templates',
+  path: '/templates',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SheetsRoute = SheetsRouteImport.update({
+  id: '/sheets',
+  path: '/sheets',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ScanRoute = ScanRouteImport.update({
+  id: '/scan',
+  path: '/scan',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
   path: '/register',
@@ -24,9 +54,39 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EmailCampaignsRoute = EmailCampaignsRouteImport.update({
+  id: '/email-campaigns',
+  path: '/email-campaigns',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CreditsRoute = CreditsRouteImport.update({
+  id: '/credits',
+  path: '/credits',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConnectionsRoute = ConnectionsRouteImport.update({
+  id: '/connections',
+  path: '/connections',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CompaniesRoute = CompaniesRouteImport.update({
+  id: '/companies',
+  path: '/companies',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CampaignsRoute = CampaignsRouteImport.update({
+  id: '/campaigns',
+  path: '/campaigns',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -37,40 +97,151 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
+  '/campaigns': typeof CampaignsRoute
+  '/companies': typeof CompaniesRoute
+  '/connections': typeof ConnectionsRoute
+  '/credits': typeof CreditsRoute
   '/dashboard': typeof DashboardRoute
+  '/email-campaigns': typeof EmailCampaignsRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/scan': typeof ScanRoute
+  '/sheets': typeof SheetsRoute
+  '/templates': typeof TemplatesRoute
+  '/warmup': typeof WarmupRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
+  '/campaigns': typeof CampaignsRoute
+  '/companies': typeof CompaniesRoute
+  '/connections': typeof ConnectionsRoute
+  '/credits': typeof CreditsRoute
   '/dashboard': typeof DashboardRoute
+  '/email-campaigns': typeof EmailCampaignsRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/scan': typeof ScanRoute
+  '/sheets': typeof SheetsRoute
+  '/templates': typeof TemplatesRoute
+  '/warmup': typeof WarmupRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
+  '/campaigns': typeof CampaignsRoute
+  '/companies': typeof CompaniesRoute
+  '/connections': typeof ConnectionsRoute
+  '/credits': typeof CreditsRoute
   '/dashboard': typeof DashboardRoute
+  '/email-campaigns': typeof EmailCampaignsRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/scan': typeof ScanRoute
+  '/sheets': typeof SheetsRoute
+  '/templates': typeof TemplatesRoute
+  '/warmup': typeof WarmupRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/dashboard' | '/login' | '/register'
+  fullPaths:
+    | '/'
+    | '/admin'
+    | '/campaigns'
+    | '/companies'
+    | '/connections'
+    | '/credits'
+    | '/dashboard'
+    | '/email-campaigns'
+    | '/login'
+    | '/register'
+    | '/scan'
+    | '/sheets'
+    | '/templates'
+    | '/warmup'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/dashboard' | '/login' | '/register'
-  id: '__root__' | '/' | '/dashboard' | '/login' | '/register'
+  to:
+    | '/'
+    | '/admin'
+    | '/campaigns'
+    | '/companies'
+    | '/connections'
+    | '/credits'
+    | '/dashboard'
+    | '/email-campaigns'
+    | '/login'
+    | '/register'
+    | '/scan'
+    | '/sheets'
+    | '/templates'
+    | '/warmup'
+  id:
+    | '__root__'
+    | '/'
+    | '/admin'
+    | '/campaigns'
+    | '/companies'
+    | '/connections'
+    | '/credits'
+    | '/dashboard'
+    | '/email-campaigns'
+    | '/login'
+    | '/register'
+    | '/scan'
+    | '/sheets'
+    | '/templates'
+    | '/warmup'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRoute
+  CampaignsRoute: typeof CampaignsRoute
+  CompaniesRoute: typeof CompaniesRoute
+  ConnectionsRoute: typeof ConnectionsRoute
+  CreditsRoute: typeof CreditsRoute
   DashboardRoute: typeof DashboardRoute
+  EmailCampaignsRoute: typeof EmailCampaignsRoute
   LoginRoute: typeof LoginRoute
   RegisterRoute: typeof RegisterRoute
+  ScanRoute: typeof ScanRoute
+  SheetsRoute: typeof SheetsRoute
+  TemplatesRoute: typeof TemplatesRoute
+  WarmupRoute: typeof WarmupRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/warmup': {
+      id: '/warmup'
+      path: '/warmup'
+      fullPath: '/warmup'
+      preLoaderRoute: typeof WarmupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/templates': {
+      id: '/templates'
+      path: '/templates'
+      fullPath: '/templates'
+      preLoaderRoute: typeof TemplatesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sheets': {
+      id: '/sheets'
+      path: '/sheets'
+      fullPath: '/sheets'
+      preLoaderRoute: typeof SheetsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/scan': {
+      id: '/scan'
+      path: '/scan'
+      fullPath: '/scan'
+      preLoaderRoute: typeof ScanRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/register': {
       id: '/register'
       path: '/register'
@@ -85,11 +256,53 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/email-campaigns': {
+      id: '/email-campaigns'
+      path: '/email-campaigns'
+      fullPath: '/email-campaigns'
+      preLoaderRoute: typeof EmailCampaignsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard': {
       id: '/dashboard'
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/credits': {
+      id: '/credits'
+      path: '/credits'
+      fullPath: '/credits'
+      preLoaderRoute: typeof CreditsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/connections': {
+      id: '/connections'
+      path: '/connections'
+      fullPath: '/connections'
+      preLoaderRoute: typeof ConnectionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/companies': {
+      id: '/companies'
+      path: '/companies'
+      fullPath: '/companies'
+      preLoaderRoute: typeof CompaniesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/campaigns': {
+      id: '/campaigns'
+      path: '/campaigns'
+      fullPath: '/campaigns'
+      preLoaderRoute: typeof CampaignsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -104,9 +317,19 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRoute,
+  CampaignsRoute: CampaignsRoute,
+  CompaniesRoute: CompaniesRoute,
+  ConnectionsRoute: ConnectionsRoute,
+  CreditsRoute: CreditsRoute,
   DashboardRoute: DashboardRoute,
+  EmailCampaignsRoute: EmailCampaignsRoute,
   LoginRoute: LoginRoute,
   RegisterRoute: RegisterRoute,
+  ScanRoute: ScanRoute,
+  SheetsRoute: SheetsRoute,
+  TemplatesRoute: TemplatesRoute,
+  WarmupRoute: WarmupRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
