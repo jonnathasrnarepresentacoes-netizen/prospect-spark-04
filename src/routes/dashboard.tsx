@@ -1,31 +1,17 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
-import { mockStats, mockUser, recentScans } from "@/lib/mock-data";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/lib/auth";
 import {
-  Search, Building2, Send, Mail, FileText, Plug, Users, Coins,
-  TrendingUp, Zap, ArrowUpRight, Flame
+  Search, Building2, Send, Mail, FileText, Plug, Coins,
+  TrendingUp, Zap, ArrowUpRight, Flame, Loader2
 } from "lucide-react";
 
 export const Route = createFileRoute("/dashboard")({
   component: Dashboard,
   head: () => ({ meta: [{ title: "Dashboard — Atual Prospect" }] }),
 });
-
-const stats = [
-  { label: "Créditos disponíveis", value: mockUser.credits.toLocaleString("pt-BR"), icon: Coins, trend: "+12%", color: "text-primary" },
-  { label: "Extrações hoje", value: mockStats.extractionsLeft, icon: Search, trend: "1.85k restantes", color: "text-accent" },
-  { label: "Envios hoje", value: mockStats.sendsLeft, icon: Send, trend: "980 restantes", color: "text-success" },
-  { label: "Contatos extraídos", value: mockStats.totalContacts.toLocaleString("pt-BR"), icon: Users, trend: "+2.4k esta semana", color: "text-warning" },
-];
-
-const cards = [
-  { label: "Camp. WhatsApp", value: mockStats.totalWhatsappCampaigns, icon: Send, to: "/campaigns" },
-  { label: "Camp. E-mail", value: mockStats.totalEmailCampaigns, icon: Mail, to: "/email-campaigns" },
-  { label: "Conexões WhatsApp", value: mockStats.totalWhatsappConnections, icon: Plug, to: "/connections" },
-  { label: "Conexões E-mail", value: mockStats.totalEmailConnections, icon: Plug, to: "/connections" },
-  { label: "Templates", value: mockStats.totalTemplates, icon: FileText, to: "/templates" },
-  { label: "Aquecimento", value: 3, icon: Flame, to: "/warmup" },
-];
 
 const shortcuts = [
   { label: "Buscar empresas", desc: "Base CNPJ Brasil", icon: Building2, to: "/companies", color: "from-cyan-500/20 to-cyan-500/5" },
@@ -35,17 +21,51 @@ const shortcuts = [
 ];
 
 function Dashboard() {
+  const { user, profile } = useAuth();
+  const [counts, setCounts] = useState({ wa: 0, email: 0, conn: 0, tpl: 0, warm: 0, scans: 0 });
+  const [recent, setRecent] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!user) return;
+    (async () => {
+      const [wa, em, conn, tpl, warm, scans, recents] = await Promise.all([
+        supabase.from("campaigns").select("id", { count: "exact", head: true }).eq("channel", "whatsapp"),
+        supabase.from("campaigns").select("id", { count: "exact", head: true }).eq("channel", "email"),
+        supabase.from("connections").select("id", { count: "exact", head: true }),
+        supabase.from("templates").select("id", { count: "exact", head: true }),
+        supabase.from("warmup_campaigns").select("id", { count: "exact", head: true }),
+        supabase.from("scan_history").select("id", { count: "exact", head: true }),
+        supabase.from("scan_history").select("*").order("created_at", { ascending: false }).limit(5),
+      ]);
+      setCounts({
+        wa: wa.count ?? 0, email: em.count ?? 0, conn: conn.count ?? 0,
+        tpl: tpl.count ?? 0, warm: warm.count ?? 0, scans: scans.count ?? 0,
+      });
+      setRecent(recents.data ?? []);
+      setLoading(false);
+    })();
+  }, [user]);
+
+  const cards = [
+    { label: "Camp. WhatsApp", value: counts.wa, icon: Send, to: "/campaigns" },
+    { label: "Camp. E-mail", value: counts.email, icon: Mail, to: "/email-campaigns" },
+    { label: "Conexões", value: counts.conn, icon: Plug, to: "/connections" },
+    { label: "Templates", value: counts.tpl, icon: FileText, to: "/templates" },
+    { label: "Aquecimento", value: counts.warm, icon: Flame, to: "/warmup" },
+    { label: "Buscas CNPJ", value: counts.scans, icon: Search, to: "/companies" },
+  ];
+
   return (
-    <AppShell title="Dashboard" subtitle={`Bem-vindo de volta, ${mockUser.name.split(" ")[0]} 👋`}>
-      {/* Plan banner */}
-      <div className="rounded-2xl bg-gradient-brand-soft border border-primary/20 p-5 mb-6 flex items-center justify-between">
+    <AppShell title="Dashboard" subtitle={`Bem-vindo, ${(profile?.full_name ?? "explorador").split(" ")[0]} 👋`}>
+      <div className="rounded-2xl bg-gradient-brand-soft border border-primary/20 p-5 mb-6 flex items-center justify-between flex-wrap gap-3">
         <div className="flex items-center gap-4">
           <div className="w-12 h-12 rounded-xl bg-gradient-brand flex items-center justify-center shadow-glow">
             <Zap className="w-6 h-6 text-white" />
           </div>
           <div>
             <div className="text-xs text-muted-foreground uppercase tracking-widest">Plano atual</div>
-            <div className="text-xl font-bold">Pro · {mockUser.credits.toLocaleString("pt-BR")} créditos</div>
+            <div className="text-xl font-bold capitalize">{profile?.plan_slug ?? "free"} · {(profile?.credits ?? 0).toLocaleString("pt-BR")} créditos</div>
           </div>
         </div>
         <Link to="/credits" className="text-sm text-primary hover:underline flex items-center gap-1 font-medium">
@@ -53,24 +73,6 @@ function Dashboard() {
         </Link>
       </div>
 
-      {/* Stats */}
-      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        {stats.map((s) => (
-          <div key={s.label} className="bg-gradient-card border border-border rounded-2xl p-5 hover:border-primary/30 transition">
-            <div className="flex items-center justify-between mb-3">
-              <div className={`w-10 h-10 rounded-lg bg-card border border-border flex items-center justify-center ${s.color}`}>
-                <s.icon className="w-5 h-5" />
-              </div>
-              <TrendingUp className="w-4 h-4 text-success" />
-            </div>
-            <div className="text-2xl font-bold">{s.value}</div>
-            <div className="text-xs text-muted-foreground mt-1">{s.label}</div>
-            <div className="text-[10px] text-success mt-2">{s.trend}</div>
-          </div>
-        ))}
-      </div>
-
-      {/* Shortcuts */}
       <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-widest mb-3">Atalhos rápidos</h2>
       <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         {shortcuts.map((s) => (
@@ -82,7 +84,6 @@ function Dashboard() {
         ))}
       </div>
 
-      {/* Mini cards + recent */}
       <div className="grid lg:grid-cols-3 gap-6">
         <div className="lg:col-span-1">
           <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-widest mb-3">Resumo da conta</h2>
@@ -90,7 +91,7 @@ function Dashboard() {
             {cards.map((c) => (
               <Link key={c.label} to={c.to} className="bg-card border border-border rounded-xl p-4 hover:border-primary/40 transition">
                 <c.icon className="w-4 h-4 text-muted-foreground mb-2" />
-                <div className="text-xl font-bold">{c.value}</div>
+                <div className="text-xl font-bold">{loading ? "..." : c.value}</div>
                 <div className="text-[10px] text-muted-foreground">{c.label}</div>
               </Link>
             ))}
@@ -99,30 +100,34 @@ function Dashboard() {
 
         <div className="lg:col-span-2">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-widest">Varreduras recentes</h2>
-            <Link to="/scan" className="text-xs text-primary hover:underline">Ver todas →</Link>
+            <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-widest">Buscas recentes</h2>
+            <Link to="/companies" className="text-xs text-primary hover:underline">Nova busca →</Link>
           </div>
           <div className="bg-gradient-card border border-border rounded-2xl overflow-hidden">
-            <table className="w-full text-sm">
-              <thead className="bg-card/50">
-                <tr className="text-left text-xs text-muted-foreground uppercase tracking-wider">
-                  <th className="px-4 py-3 font-medium">Nome</th>
-                  <th className="px-4 py-3 font-medium">Filtros</th>
-                  <th className="px-4 py-3 font-medium text-right">Resultados</th>
-                  <th className="px-4 py-3 font-medium">Data</th>
-                </tr>
-              </thead>
-              <tbody>
-                {recentScans.map((r) => (
-                  <tr key={r.id} className="border-t border-border hover:bg-card/40 transition">
-                    <td className="px-4 py-3 font-medium">{r.name}</td>
-                    <td className="px-4 py-3 text-xs text-muted-foreground">{r.filters}</td>
-                    <td className="px-4 py-3 text-right font-mono text-primary">{r.results.toLocaleString("pt-BR")}</td>
-                    <td className="px-4 py-3 text-xs text-muted-foreground">{r.date}</td>
+            {loading ? (
+              <div className="flex justify-center py-8"><Loader2 className="w-5 h-5 animate-spin text-primary" /></div>
+            ) : recent.length === 0 ? (
+              <div className="text-center py-8 text-sm text-muted-foreground">Nenhuma busca ainda. <Link to="/companies" className="text-primary hover:underline">Faça a primeira →</Link></div>
+            ) : (
+              <table className="w-full text-sm">
+                <thead className="bg-card/50">
+                  <tr className="text-left text-xs text-muted-foreground uppercase tracking-wider">
+                    <th className="px-4 py-3 font-medium">Nome</th>
+                    <th className="px-4 py-3 font-medium text-right">Resultados</th>
+                    <th className="px-4 py-3 font-medium">Data</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {recent.map((r) => (
+                    <tr key={r.id} className="border-t border-border hover:bg-card/40 transition">
+                      <td className="px-4 py-3 font-medium">{r.name ?? "Busca sem nome"}</td>
+                      <td className="px-4 py-3 text-right font-mono text-primary">{r.results_count.toLocaleString("pt-BR")}</td>
+                      <td className="px-4 py-3 text-xs text-muted-foreground">{new Date(r.created_at).toLocaleDateString("pt-BR")}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
           </div>
         </div>
       </div>
